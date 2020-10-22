@@ -25,10 +25,31 @@ search_engines = [
 ]
 
 
-googleCookieDict = [
+# {
+#     'name': '',
+#     'value': '',
+#     'domain': '.google.com'
+# },
+
+google_cookie_dict = [
     {
-        'name': '',
-        'value': '',
+        'name': 'CONSENT',
+        'value': 'YES+ES.es+V14+BX',
+        'domain': '.google.com'
+    },
+    {
+        'name': 'CGIC',
+        'value': 'IocBdGV4dC9odG1sLGFwcGxpY2F0aW9uL3hodG1sK3htbCxhcHBsaWNhdGlvbi94bWw7cT0wLjksaW1hZ2UvYXZpZixpbWFnZS93ZWJwLGltYWdlL2FwbmcsKi8qO3E9MC44LGFwcGxpY2F0aW9uL3NpZ25lZC1leGNoYW5nZTt2PWIzO3E9MC45',
+        'domain': '.google.com'
+    },
+    {
+        'name': '1P-JAR',
+        'value': '2020-10-22-12',
+        'domain': '.google.com'
+    },
+    {
+        'name': 'NID',
+        'value': '204=Z9hccyZGL8V0peRLI966PZfrpOsgC8-pBBxoBG6_2oBD-nvIR_umPzdYEGjzmEs8JoK9O88HX6M6P4sYwtlecUAemvPxmD10ikycEABYXDMJuHA0g5G8CA_wf0jqf0cqhfpLAuXZiuJbW0p_4QOEMeAqDpldDFb4ehoY6fGbx9I',
         'domain': '.google.com'
     },
 ]
@@ -84,11 +105,8 @@ class Spartacus():
             self.driver.quit()
 
     def load_google_cookies(self):
-        self.driver.add_cookie({
-            'name': 'CONSENT',
-            'value': 'YES+ES.es+V14+BX',
-            'domain': '.google.com'
-        })
+        for cookie in google_cookie_dict:
+            self.driver.add_cookie(cookie)
 
 
 def get_google_responses(page_source, limit=5):
