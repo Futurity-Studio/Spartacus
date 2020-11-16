@@ -1,35 +1,9 @@
-from Spartacus import Spartacus
-import speech_recognition as sr
-import pyttsx3
+from Spartacus import Spartacus, audio_out, audio_in
+
+# todo -- test more, code is scrappy af
 
 s = Spartacus()
 
-
-# s.go_to_link()
-# s.interact_with_link()
-s.query_search_engines("how much does milk cost")
-
-
-#
-# def speak_text(command):
-#     # Initialize the engine
-#     engine = pyttsx3.init()
-#     # voices = engine.getProperty('voices')       #getting details of current voice
-#     # engine.setProperty('voice', voices[1].id)   #changing index, changes voices. 1 for female
-#     engine.say(command)
-#     engine.runAndWait()
-#
-#
-# r = sr.Recognizer()
-
-# with sr.Microphone() as source:
-#     try:
-#         print("Say something!")
-#         audio = r.listen(source)
-#         print("Google Speech Recognition thinks you said " + r.recognize_google(audio))
-#     except sr.UnknownValueError:
-#         print('error...')
-#     except sr.RequestError as e:
-#         print('request error')
-
-# speak_text('what is the price of a TV')
+query_statement = audio_in()
+query_response = s.query_search_engines(query_statement)
+audio_out(query_response)

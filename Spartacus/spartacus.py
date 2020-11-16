@@ -57,6 +57,14 @@ class Spartacus:
         self.driver = None
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('--headless')
+        self.unified_response = ''
+
+    # todo -- add support for DuckDuckGo
+    # todo -- add support for Bing
+    # todo -- add support for firebase <> cookie modules
+    # todo -- create nodejs express server to interface cookies
+    # todo -- create conceptual smart contract process for paying people for their cookies
+    # todo -- add packet sniffing... 🙃
 
     def go_to_link(self):
         self.driver = webdriver.Chrome(chrome_options=self.options)
@@ -82,6 +90,17 @@ class Spartacus:
 
             time.sleep(3)
             self.driver.quit()
+            return self.unified_response
+
+    def unify_response(self, responses):
+        """
+        todo -- something magical happens here...
+            some examples:
+
+        """
+
+        # set single response as class variable... (useful for more than one data source)
+        self.unified_response = ''
 
     def load_google_cookies(self):
         for cookie in google_cookie_dict:
@@ -102,11 +121,15 @@ class Spartacus:
         #     print(result_text)
 
         # Featured Snippets
+        featured_response_texts = []
         featured_snippets = soup.find_all('h2', string="Featured snippet from the web")
         for featured_snippet in featured_snippets:
             sibling = featured_snippet.find_next_sibling()
             featured_response_text = sibling.contents[0].get_text()
-            print(featured_response_text)
+            # print(featured_response_text)
+            featured_response_texts.append(featured_response_text)
+
+        self.unify_response(featured_response_texts)
 
 
 def health():
