@@ -1,0 +1,1 @@
+from .spartacus import Spartacus

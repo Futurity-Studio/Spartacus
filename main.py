@@ -1,13 +1,13 @@
-import spartacus
+from Spartacus import Spartacus
 import speech_recognition as sr
 import pyttsx3
 
-s = spartacus.Spartacus()
+s = Spartacus()
 
 
 # s.go_to_link()
 # s.interact_with_link()
-s.query_search_engines("what is the price of a tv")
+s.query_search_engines("how much does milk cost")
 
 
 #
