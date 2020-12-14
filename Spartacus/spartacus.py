@@ -2,9 +2,12 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import time
+from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.firefox.options import Options as FFOptions
+from webdriver_manager.chrome import ChromeDriverManager
+import re
+from functools import reduce
 
-import speech_recognition as sr
-import pyttsx3
 
 search_engines = [
     {
@@ -55,8 +58,7 @@ class Spartacus:
     def __init__(self):
         print("I am Sparticus!")
         self.driver = None
-        self.options = webdriver.ChromeOptions()
-        self.options.add_argument('--headless')
+        self.options = None
         self.unified_response = ''
 
     # todo -- add support for DuckDuckGo
@@ -67,12 +69,21 @@ class Spartacus:
     # todo -- add packet sniffing... 🙃
 
     def go_to_link(self):
-        self.driver = webdriver.Chrome(chrome_options=self.options)
+        self.options = webdriver.ChromeOptions()
+        self.options.add_argument('--headless')
+        self.driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=self.options)
         self.driver.get("https://google.com")
         time.sleep(5)
         self.driver.quit()
 
-    def query_search_engines(self, query_text):
+    def go_to_link_ff(self):
+        self.driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        self.driver.get("https://google.com")
+        time.sleep(5)
+        self.driver.quit()
+
+
+    def query_search_engines_GC(self, query_text):
         for engine in search_engines:
 
             self.driver = webdriver.Chrome(chrome_options=self.options)
@@ -92,15 +103,51 @@ class Spartacus:
             self.driver.quit()
             return self.unified_response
 
+
+    def query_search_engines_FF(self, query_text):
+        for engine in search_engines:
+            self.options = FFOptions()
+            self.options.headless = True
+            self.driver = webdriver.Firefox(options=self.options, executable_path=GeckoDriverManager().install())
+            self.driver.get(engine['url'])
+            # time.sleep(1)
+
+            if engine['name'] == 'Google':
+                time.sleep(1)
+                elem = self.driver.find_element_by_name(engine['input'])
+                self.load_google_cookies()
+                elem.clear()
+                elem.send_keys(query_text)
+                elem.send_keys(Keys.RETURN)
+                time.sleep(1)
+                self.get_google_responses()
+
+            time.sleep(3)
+            self.driver.quit()
+            return self.unified_response
+
     def unify_response(self, responses):
         """
         todo -- something magical happens here...
             some examples:
 
         """
+        prices_strings = []
+        regex = re.compile(r'\$(\d?[\d.,]*\b)')
+        for s in responses:
+            print(s)
+            prices_strings.append([x.replace(',', '') for x in re.findall(regex, s)])
+
+        prices_strings = [item for sublist in prices_strings for item in sublist]
+        prices_strings_clean = filter(len, prices_strings)
+        prices_strings_float = [float(p) for p in prices_strings_clean]
+
+        exchange_rate = .82
+        mean_price = round( reduce(lambda a, b: a + b, prices_strings_float) / len(prices_strings_float) * exchange_rate, 2)
+        print(mean_price)
 
         # set single response as class variable... (useful for more than one data source)
-        self.unified_response = ''
+        self.unified_response = f'{mean_price} euro'
 
     def load_google_cookies(self):
         for cookie in google_cookie_dict:
@@ -129,7 +176,14 @@ class Spartacus:
             # print(featured_response_text)
             featured_response_texts.append(featured_response_text)
 
-        self.unify_response(featured_response_texts)
+
+        query_responses = []
+        for g in soup.find_all(class_='g'):
+            # print(g.text)
+            query_responses.append(g.text)
+        # print(query_responses)
+
+        self.unify_response(query_responses)
 
 
 def health():
